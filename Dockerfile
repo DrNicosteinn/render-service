@@ -18,6 +18,7 @@ RUN pip3 install -r requirements.txt
 
 COPY server.py .
 
+ENV PORT=8080
 EXPOSE 8080
 
-CMD gunicorn --bind 0.0.0.0:${PORT:-8080} --timeout 120 server:app
+CMD gunicorn --bind 0.0.0.0:$PORT --timeout 120 server:app
