@@ -36,10 +36,21 @@ def preview():
         ], capture_output=True, text=True, timeout=60)
 
         if result.returncode != 0:
-            return jsonify({"error": f"Inkscape Fehler: {result.stderr}"}), 500
+            return jsonify({
+                "error": f"Inkscape Fehler (code {result.returncode})",
+                "stderr": result.stderr[-2000:],
+                "stdout": result.stdout[-500:]
+            }), 500
 
+        files_in_dir = os.listdir(tmpdir)
         if not os.path.exists(png_path):
-            return jsonify({"error": "PNG wurde nicht erstellt"}), 500
+            return jsonify({
+                "error": "PNG wurde nicht erstellt",
+                "inkscape_stdout": result.stdout[-500:],
+                "inkscape_stderr": result.stderr[-2000:],
+                "files_in_tmpdir": files_in_dir,
+                "svg_size_bytes": os.path.getsize(svg_path)
+            }), 500
 
         return send_file(
             png_path,
